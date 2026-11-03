@@ -34,13 +34,20 @@ pip install --upgrade pip
 pip install -r requirements-gpu.txt
 ```
 
-If the install picks a CPU-only `torch` wheel, install the CUDA build explicitly for the machine's CUDA version, e.g.:
+`requirements-gpu.txt` pins `torch==2.4.1+cu121` (a CUDA 12.1 build), which runs on any driver reporting CUDA 12.1 or newer — this matched the Prayogshala lab driver (CUDA 12.2) when this was last checked. If `torch.cuda.is_available()` still comes back `False` after the install, check what CUDA version your driver actually supports:
 
 ```bash
-pip install torch --index-url https://download.pytorch.org/whl/cu121
+nvidia-smi   # look at "CUDA Version:" in the top-right of the header
 ```
 
-(check `nvidia-smi` for the installed CUDA version and match the index URL — cu118, cu121, cu124, etc.)
+If it's older than 12.1, reinstall torch for a matching wheel (e.g. cu118), and update the pin in `requirements-gpu.txt` to match:
+
+```bash
+pip uninstall -y torch
+pip install torch==2.4.1+cu118 --index-url https://download.pytorch.org/whl/cu118
+```
+
+(cu118, cu121, cu124, etc. — pick the index matching `nvidia-smi`'s reported CUDA version.)
 
 ### Option B — Google Colab
 

@@ -26,7 +26,8 @@ A real bug was found and fixed along the way: 1A's own `tokenize_sft` function c
 ### Option A — BITS Prayogshala lab (or any SSH'd CUDA Linux box)
 
 ```bash
-cd /path/to/this/project          # copy or git-clone this whole folder there first
+git clone https://github.com/VijayYD/2025AE05316-LLM-2A.git
+cd 2025AE05316-LLM-2A
 python3 -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
@@ -43,13 +44,14 @@ pip install torch --index-url https://download.pytorch.org/whl/cu121
 
 ### Option B — Google Colab
 
-1. Upload this whole folder to Google Drive (or `git clone` it into the Colab runtime), then in a Colab cell:
+1. In a Colab cell, clone straight from GitHub (simplest — no Drive mount needed):
 
 ```python
-from google.colab import drive
-drive.mount('/content/drive')
-%cd /content/drive/MyDrive/<path-to-this-folder>
+!git clone https://github.com/VijayYD/2025AE05316-LLM-2A.git
+%cd 2025AE05316-LLM-2A
 ```
+
+(Or, to persist outputs across Colab sessions, clone into Google Drive instead: mount Drive, then run the same `git clone` inside `/content/drive/MyDrive/`.)
 
 2. Runtime → Change runtime type → GPU (T4 is enough).
 3. Install dependencies:

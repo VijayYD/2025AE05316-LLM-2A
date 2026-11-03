@@ -1,0 +1,62 @@
+[
+  {
+    "instruction": "How do compute-optimal scaling laws (like Chinchilla) dictate model design?",
+    "response": "Chinchilla scaling laws state that model size and training token count should be scaled equally in proportion to compute budgets, showing that many legacy models were severely under-trained.",
+    "type": "procedural",
+    "source_idx": 17
+  },
+  {
+    "instruction": "How does Grouped-Query Attention bridge MHA and MQA performance gaps?",
+    "response": "GQA partitions query heads into distinct groups that share a smaller subset of key-value heads, recovering most of MHA's generation quality while retaining MQA's speed benefits.",
+    "type": "procedural",
+    "source_idx": 47
+  },
+  {
+    "instruction": "What does an initial cross-entropy loss around 2.5 to 3.8 signify when starting Continual Pre-Training?",
+    "response": "It confirms that pretrained weights loaded successfully and are already familiar with general language syntax, whereas a random initialization would yield a loss near 10.8.",
+    "type": "factual",
+    "source_idx": 23
+  },
+  {
+    "instruction": "What are the key training modifications introduced in RoBERTa compared to the original BERT?",
+    "response": "RoBERTa removes the Next Sentence Prediction (NSP) objective, trains with much larger mini-batches, uses dynamic masking instead of static masking, and trains over longer sequences.",
+    "type": "comparative",
+    "source_idx": 4
+  },
+  {
+    "instruction": "How does the AdamW optimizer improve weight decay implementation?",
+    "response": "AdamW decouples weight decay regularization from the gradient-based adaptive learning rate updates, leading to proper regularization for models like transformers.",
+    "type": "procedural",
+    "source_idx": 25
+  },
+  {
+    "instruction": "What is the purpose of Reinforcement Learning from Human Feedback (RLHF) in models like InstructGPT?",
+    "response": "RLHF aligns language model outputs with human preferences regarding helpfulness, honesty, and harmlessness by training a reward model and optimizing via PPO.",
+    "type": "factual",
+    "source_idx": 20
+  },
+  {
+    "instruction": "How does prompt tuning differ from the discrete text prompts used with GPT-3's few-shot learning?",
+    "response": "Prompt tuning learns a sequence of continuous, trainable soft-prompt vectors through backpropagation and prepends them to the input, instead of relying on hand-written natural-language text; these learned vectors are optimized directly from labeled examples, letting prompt tuning substantially outperform GPT-3's few-shot prompting while keeping the underlying language model completely frozen.",
+    "type": "comparative",
+    "source_idx": 52
+  },
+  {
+    "instruction": "What is the function of RMSNorm in architectures like SmolLM2?",
+    "response": "RMSNorm normalizes the inputs based on the root mean square, offering computational efficiency gains over standard LayerNorm without sacrificing training stability.",
+    "type": "factual",
+    "source_idx": 21
+  },
+  {
+    "instruction": "Why does Transformer architecture divide the dot product by the square root of d_k in attention?",
+    "response": "For large values of d_k, the dot products grow large in magnitude, pushing the softmax function into regions with extremely small gradients. Dividing by sqrt(d_k) counteracts this effect.",
+    "type": "factual",
+    "source_idx": 1
+  },
+  {
+    "instruction": "Can LoRA weights be merged back into the base weights during model deployment?",
+    "response": "Yes, during deployment, the product delta_W = B * A can be explicitly added to W_0, introducing zero additional inference latency.",
+    "type": "factual",
+    "source_idx": 9
+  }
+]

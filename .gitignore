@@ -1,0 +1,14 @@
+.DS_Store
+.venv/
+
+# Dev-scale placeholder model weights — regenerated on labs via `train_adapter.py --mode full`
+# (see RUNBOOK.md). Too large for git anyway (cpt_final_model/model.safetensors is ~1.3GB,
+# over GitHub's 100MB per-file limit) and not needed since labs will retrain from scratch.
+cpt_final_model/
+final_qlora_adapter/
+cpt_checkpoints/
+qlora_adapter_checkpoints/
+cpt_packed.parquet
+
+# Local run logs from this Mac's dev-scale validation runs — not part of the deliverable
+*.log

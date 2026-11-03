@@ -1,19 +1,20 @@
 # Runbook — Assignment 2A (Group 172)
 
-How to run this project end to end on a GPU machine (BITS Prayogshala lab, Google Colab, or any other CUDA box). Everything here has already been validated at small scale on a local CPU/MPS Mac; this runbook is for producing the real, full-fidelity submission.
+How to run this project end to end on a GPU machine (BITS Prayogshala lab, Google Colab, or any other CUDA box). Part A has already been run successfully on an A100 on labs with real, grounded results; Parts B and C are built but not yet executed with the real adapter and judge. This runbook covers producing that full run.
 
 ## 0. What's in this folder
 
 | File | Purpose |
 |---|---|
-| `Assignment2A_Group172.ipynb` | The deliverable notebook (Setup, Part A; Parts B/C still to come) |
+| `Assignment2A_Group172.ipynb` | The deliverable notebook — Setup, Part A, Part B, Part C, all built |
 | `train_adapter.py` | Reproduces 1A's two-stage pipeline (CPT, then QLoRA SFT) to regenerate the adapter |
 | `instruction_dataset.jsonl` | 58 instruction/response pairs (50 from 1A + 8 supplementary, approved) |
 | `domain_corpus/` | 13 cleaned source papers (same corpus as 1A) |
 | `benchmark_10.json` | The fixed 10-query benchmark set used throughout Parts A/B/C |
 | `requirements.txt` | Pins used for this local Mac (CPU/MPS only) — do **not** use this on a GPU machine |
 | `requirements-gpu.txt` | Dependency set for a CUDA machine (labs, Colab) — use this instead |
-| `results_partA.csv`, `*.csv` | Raw per-query results, produced by running the notebook |
+| `results_partA.csv` | Real per-query Part A results (already produced on labs; reruns overwrite it) |
+| `results_partB.csv`, `results_partC.csv` | Produced the first time Part B / Part C run to completion |
 
 ## 1. Why you need to re-run training here
 
@@ -92,21 +93,15 @@ This reproduces 1A exactly: 10 CPT epochs (900 steps on the full 399 packed sequ
 
 It overwrites `./cpt_final_model` and `./final_qlora_adapter` in place — the notebook already points at these same paths, so no path changes are needed.
 
-## 5. Point the judge at the real Qwen2.5-7B-Instruct
+## 5. The judge model
 
-The notebook's A4 judge cell currently uses a tiny placeholder for local dev:
-
-```python
-JUDGE_MODEL_ID = "Qwen/Qwen2.5-0.5B-Instruct"  # local dev placeholder; swap to "Qwen/Qwen2.5-7B-Instruct" on Prayogshala
-```
-
-Change this one line to:
+The notebook's A4 judge cell already points at the real model (updated after the first labs run confirmed an A100 with plenty of free VRAM):
 
 ```python
 JUDGE_MODEL_ID = "Qwen/Qwen2.5-7B-Instruct"
 ```
 
-If the GPU has less than ~16 GB free VRAM, load it in 4-bit instead — replace the judge model load cell's `AutoModelForCausalLM.from_pretrained(...)` call with:
+No change needed on a GPU with 16GB+ free VRAM (check with `nvidia-smi`, as in step 3). If you're on a smaller GPU, load it in 4-bit instead — replace the judge model load cell's `AutoModelForCausalLM.from_pretrained(...)` call with:
 
 ```python
 from transformers import BitsAndBytesConfig
@@ -141,7 +136,9 @@ then open `Assignment2A_Group172.ipynb` in JupyterLab, switch the kernel (top-ri
 
 Either way, every output must come from this real run — don't hand-edit any output cell.
 
-`benchmark_10.json` is already fixed and reused as-is (the notebook only reads it, it isn't regenerated). This run regenerates `results_partA.csv` and the Part A results table with real numbers from the full-fidelity adapter and the real Qwen2.5-7B-Instruct judge.
+`benchmark_10.json` is already fixed and reused as-is (the notebook only reads it, it isn't regenerated). A fresh full run regenerates `results_partA.csv`, `results_partB.csv`, and `results_partC.csv` with real numbers end to end.
+
+Before this run, check the TODO (Vijay) cell in Part C (the 5 hand-picked classifier test queries and their gold labels) — it's drafted so C1 isn't blocked, but the brief asks you to label those yourself, so confirm or edit them before trusting the classifier's reported accuracy.
 
 ## 7. Export to HTML and finish up
 
@@ -151,9 +148,11 @@ jupyter nbconvert --to html Assignment2A_Group172.ipynb
 
 Then, per the assignment's ground rules:
 - Scan the notebook for any leftover "marks" text (there shouldn't be any — already checked) and remove anything that slipped in.
-- List every remaining `TODO (Vijay):` and `DRAFT -- review before submission:` cell so the human-judgement parts (spot-checks, verdicts) can be completed before submission.
-- Check off the submission checklist (notebook + HTML, `benchmark_10.json`, `results_partA.csv`, and any other raw-results CSVs from Parts B/C once built).
+- List every remaining `TODO (Vijay):` and `DRAFT -- review before submission:` cell so the human-judgement parts can be completed before submission. As of this writing there are 3 of each:
+  - `TODO (Vijay):` — the Part A dataset spot-check (15 pairs), the Part A judge spot-check (5 rows, agree/disagree), and the Part C classifier test set (5 queries/labels)
+  - `DRAFT --`: the Part A self-critique verdict, the Part B plan-solve-verify verdict, the Part C ~100-word router analysis — all computed from real numbers, but worth a human read before submitting
+- Check off the submission checklist (notebook + HTML, `benchmark_10.json`, `results_partA.csv`, `results_partB.csv`, `results_partC.csv`).
 
 ## 8. Send results back
 
-Once this has run on the labs machine, share: the executed `.ipynb`, the `.html` export, and the CSVs (`results_partA.csv` and any Part B/C equivalents). From there, remaining gaps (Parts B and C, which haven't been built yet) will continue against the real results instead of the dev-scale placeholder.
+Once this has run on the labs machine, share: the executed `.ipynb`, the `.html` export, and the CSVs (`results_partA.csv`, `results_partB.csv`, `results_partC.csv`). Parts A, B, and C are all built; what's left after this run is the human-judgement TODOs and DRAFT reviews above, plus the final kernel-restart-and-run-all pass before submission.

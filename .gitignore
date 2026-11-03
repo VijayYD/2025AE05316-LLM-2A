@@ -8,7 +8,9 @@ cpt_final_model/
 final_qlora_adapter/
 cpt_checkpoints/
 qlora_adapter_checkpoints/
-cpt_packed.parquet
+cpt_train_packed.parquet
+cpt_eval_packed.parquet
 
 # Local run logs from this Mac's dev-scale validation runs — not part of the deliverable
 *.log
+__pycache__/

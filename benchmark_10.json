@@ -1,62 +1,62 @@
 [
-  {
-    "instruction": "How do compute-optimal scaling laws (like Chinchilla) dictate model design?",
-    "response": "Chinchilla scaling laws state that model size and training token count should be scaled equally in proportion to compute budgets, showing that many legacy models were severely under-trained.",
-    "type": "procedural",
-    "source_idx": 17
-  },
-  {
-    "instruction": "How does Grouped-Query Attention bridge MHA and MQA performance gaps?",
-    "response": "GQA partitions query heads into distinct groups that share a smaller subset of key-value heads, recovering most of MHA's generation quality while retaining MQA's speed benefits.",
-    "type": "procedural",
-    "source_idx": 47
-  },
-  {
-    "instruction": "What does an initial cross-entropy loss around 2.5 to 3.8 signify when starting Continual Pre-Training?",
-    "response": "It confirms that pretrained weights loaded successfully and are already familiar with general language syntax, whereas a random initialization would yield a loss near 10.8.",
-    "type": "factual",
-    "source_idx": 23
-  },
-  {
-    "instruction": "What are the key training modifications introduced in RoBERTa compared to the original BERT?",
-    "response": "RoBERTa removes the Next Sentence Prediction (NSP) objective, trains with much larger mini-batches, uses dynamic masking instead of static masking, and trains over longer sequences.",
-    "type": "comparative",
-    "source_idx": 4
-  },
-  {
-    "instruction": "How does the AdamW optimizer improve weight decay implementation?",
-    "response": "AdamW decouples weight decay regularization from the gradient-based adaptive learning rate updates, leading to proper regularization for models like transformers.",
-    "type": "procedural",
-    "source_idx": 25
-  },
-  {
-    "instruction": "What is the purpose of Reinforcement Learning from Human Feedback (RLHF) in models like InstructGPT?",
-    "response": "RLHF aligns language model outputs with human preferences regarding helpfulness, honesty, and harmlessness by training a reward model and optimizing via PPO.",
-    "type": "factual",
-    "source_idx": 20
-  },
-  {
-    "instruction": "How does prompt tuning differ from the discrete text prompts used with GPT-3's few-shot learning?",
-    "response": "Prompt tuning learns a sequence of continuous, trainable soft-prompt vectors through backpropagation and prepends them to the input, instead of relying on hand-written natural-language text; these learned vectors are optimized directly from labeled examples, letting prompt tuning substantially outperform GPT-3's few-shot prompting while keeping the underlying language model completely frozen.",
-    "type": "comparative",
-    "source_idx": 52
-  },
-  {
-    "instruction": "What is the function of RMSNorm in architectures like SmolLM2?",
-    "response": "RMSNorm normalizes the inputs based on the root mean square, offering computational efficiency gains over standard LayerNorm without sacrificing training stability.",
-    "type": "factual",
-    "source_idx": 21
-  },
-  {
-    "instruction": "Why does Transformer architecture divide the dot product by the square root of d_k in attention?",
-    "response": "For large values of d_k, the dot products grow large in magnitude, pushing the softmax function into regions with extremely small gradients. Dividing by sqrt(d_k) counteracts this effect.",
-    "type": "factual",
-    "source_idx": 1
-  },
-  {
-    "instruction": "Can LoRA weights be merged back into the base weights during model deployment?",
-    "response": "Yes, during deployment, the product delta_W = B * A can be explicitly added to W_0, introducing zero additional inference latency.",
-    "type": "factual",
-    "source_idx": 9
-  }
+    {
+        "instruction": "How much memory does double quantization save in QLoRA?",
+        "response": "Double quantization applies a second round of quantization to the 32-bit constants that scale each block of weights, storing them in 8 bits instead. This cuts the overhead from about 0.5 to about 0.127 bits per parameter, saving roughly 0.37 bits per parameter, or around 3 GB for a 65B model.",
+        "type": "factual",
+        "source_idx": 27
+    },
+    {
+        "instruction": "What is prefix-tuning and how many parameters does it train?",
+        "response": "Prefix-tuning keeps all language model parameters frozen and learns a short sequence of continuous task-specific vectors that act like virtual tokens placed before the input. Only about 0.1 percent of the parameters are trained, so one frozen model can serve many tasks with a small prefix stored for each.",
+        "type": "factual",
+        "source_idx": 30
+    },
+    {
+        "instruction": "What are the three main innovations introduced by QLoRA?",
+        "response": "QLoRA introduces the 4-bit NormalFloat data type for normally distributed weights, double quantization that also compresses the quantization constants, and paged optimizers that move optimizer states to CPU memory during memory spikes. Together they allow a 65 billion parameter model to be fine-tuned on a single 48 GB GPU.",
+        "type": "factual",
+        "source_idx": 25
+    },
+    {
+        "instruction": "How does PPO-ptx differ from the plain PPO model in InstructGPT?",
+        "response": "Plain PPO training caused performance regressions on public NLP benchmarks such as SQuAD, DROP and HellaSwag, an effect the authors call an alignment tax. PPO-ptx mixes pre-training gradients into the PPO updates, which greatly reduces these regressions without hurting labeler preference scores.",
+        "type": "comparative",
+        "source_idx": 57
+    },
+    {
+        "instruction": "How did the GPT-3 authors check whether benchmark contamination affected their results?",
+        "response": "They searched for overlaps between each benchmark's test examples and the training data, using 13-gram matches to flag potentially contaminated items. They then built clean subsets without those items and compared scores on the clean and full versions, finding that most benchmarks were barely affected.",
+        "type": "procedural",
+        "source_idx": 8
+    },
+    {
+        "instruction": "Outline how BERT is adapted to a downstream classification task.",
+        "response": "The pre-trained network is reused unchanged and a single task-specific output layer is placed on top of the final hidden state of the special [CLS] token. All parameters, both pre-trained and new, are then fine-tuned end to end on the labelled task data for a few epochs.",
+        "type": "procedural",
+        "source_idx": 4
+    },
+    {
+        "instruction": "How does the LLaMA tokenizer handle numbers and unknown characters?",
+        "response": "LLaMA tokenizes text with byte-pair encoding implemented in SentencePiece. Every number is split into individual digits, and any character missing from the vocabulary falls back to its UTF-8 bytes, so no input string is ever mapped to an unknown token.",
+        "type": "factual",
+        "source_idx": 14
+    },
+    {
+        "instruction": "How is the DPO training loss computed for a single preference pair?",
+        "response": "For a prompt with a preferred and a rejected response, the log probability ratio between the trained policy and a frozen reference model is computed for each response. The difference between these two ratios, scaled by beta, is passed through a log-sigmoid, and its negative is minimised.",
+        "type": "procedural",
+        "source_idx": 51
+    },
+    {
+        "instruction": "Which corpora and model sizes were used for BERT pre-training?",
+        "response": "BERT was pre-trained on BooksCorpus, about 800 million words, and English Wikipedia, about 2,500 million words, keeping only text passages. Two sizes were released: BERT-Base with 12 layers and 110 million parameters, and BERT-Large with 24 layers and 340 million parameters.",
+        "type": "factual",
+        "source_idx": 3
+    },
+    {
+        "instruction": "How does DPO compare with PPO-based RLHF in the paper's experiments?",
+        "response": "Across sentiment control, summarisation and single-turn dialogue, DPO matched or exceeded PPO-based RLHF. It achieved a better trade-off between reward and KL divergence on sentiment control while being simpler to implement, more stable and much cheaper, because no sampling from the policy is needed during training.",
+        "type": "comparative",
+        "source_idx": 53
+    }
 ]

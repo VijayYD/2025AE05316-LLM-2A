@@ -1,6 +1,8 @@
 # Runbook — Assignment 2A (Group 172)
 
-How to run this project end to end on a GPU machine (BITS Prayogshala lab, Google Colab, or any other CUDA box). Part A has already been run successfully on an A100 on labs with real, grounded results; Parts B and C are built but not yet executed with the real adapter and judge. This runbook covers producing that full run.
+How to run this project end to end on a GPU machine (BITS Prayogshala lab, Google Colab, or any other CUDA box).
+
+**Status as of this writing:** the project was previously run on labs against the wrong 1A submission path, producing real but *unfaithful* results. This has since been corrected after re-checking the actual submitted 1A notebook (`Group172_Assignment1A_submission/LLM_Assignment_1A_Group_172.ipynb`) cell by cell, which turned up several real discrepancies — a different (and correct) 65-pair instruction dataset, the real SFT chat-template format (a system prompt plus `### Question:` / `### Answer:` markers, not the previously-used `### Instruction:` / `### Response:`), correct CPT hyperparameters, and genuine 4-bit QLoRA via a response-only loss mask. All of this is now fixed in `train_adapter.py` and the notebook. **Every previous labs run is now stale and needs a fresh full retrain + full Part A/B/C re-run** — delete `cpt_final_model/` and `final_qlora_adapter/` (or let the notebook's own check do it) before the next run.
 
 ## 0. What's in this folder
 
@@ -8,7 +10,7 @@ How to run this project end to end on a GPU machine (BITS Prayogshala lab, Googl
 |---|---|
 | `Assignment2A_Group172.ipynb` | The deliverable notebook — Setup, Part A, Part B, Part C, all built |
 | `train_adapter.py` | Reproduces 1A's two-stage pipeline (CPT, then QLoRA SFT) to regenerate the adapter |
-| `instruction_dataset.jsonl` | 58 instruction/response pairs (50 from 1A + 8 supplementary, approved) |
+| `instruction_dataset.jsonl` | The real 65-pair 1A instruction dataset (5 pairs per source paper), copied verbatim from 1A's own submission |
 | `domain_corpus/` | 13 cleaned source papers (same corpus as 1A) |
 | `benchmark_10.json` | The fixed 10-query benchmark set used throughout Parts A/B/C |
 | `requirements.txt` | Pins used for this local Mac (CPU/MPS only) — do **not** use this on a GPU machine |
@@ -18,9 +20,14 @@ How to run this project end to end on a GPU machine (BITS Prayogshala lab, Googl
 
 ## 1. Why you need to re-run training here
 
-The notebook currently loads a **dev-scale placeholder adapter** (`./cpt_final_model`, `./final_qlora_adapter`) trained locally with a truncated corpus and 15 max steps, just to prove the pipeline works. It is not the real adapter — its generations are degenerate (repetitive loops) because it is severely undertrained. Before producing real submission numbers you must retrain at full scale on a GPU.
+The notebook currently loads a **dev-scale placeholder adapter** (`./cpt_final_model`, `./final_qlora_adapter`) trained locally on this Mac just to prove the (corrected) pipeline runs end to end. It is not the real adapter. Before producing real submission numbers you must retrain at full scale on a GPU.
 
-A real bug was found and fixed along the way: 1A's own `tokenize_sft` function computed the SFT loss over unmasked padding tokens, which destabilizes training. `train_adapter.py` already has the fix (labels are masked with `-100` at padding positions) — you don't need to do anything about this, just be aware the adapter you produce here will differ slightly from 1A's in the SFT loss curve shape, though the architecture, hyperparameters, and all other settings are an exact match to 1A's own executed run (cross-checked against 1A's own PDF report).
+`train_adapter.py` now matches the real 1A submission exactly, cross-checked cell by cell:
+- **Chat format:** a system prompt plus `### Question:` / `### Answer:` markers (not `### Instruction:` / `### Response:`) — the 2A notebook's `generate()`/`call_generator()` use this same format now, since the adapter was only ever trained on it.
+- **CPT:** `SEQ_LENGTH=2048`, 4 epochs, `lr=5e-5`, effective batch 8, cosine schedule with 5%-of-steps warmup, per-document held-out eval span (not a random split of packed chunks).
+- **SFT:** genuine 4-bit NF4 QLoRA (`BitsAndBytesConfig` + `prepare_model_for_kbit_training`) with a response-only loss mask (prompt tokens at `-100`), `lr=2e-4`, 8 epochs, effective batch 4, `weight_decay=0.0`, `max_grad_norm=0.3`, `paged_adamw_8bit`, 10%-of-steps warmup.
+
+The response-only loss mask subsumes the earlier padding-label fix (prompt tokens and padding are both excluded from the loss, which is the correct behavior either way).
 
 ## 2. Set up the environment
 
@@ -89,7 +96,7 @@ Confirm a CUDA GPU is visible before continuing — training and the Qwen2.5-7B-
 python train_adapter.py --mode full
 ```
 
-This reproduces 1A exactly: 10 CPT epochs (900 steps on the full 399 packed sequences) then 8 SFT epochs on the full `instruction_dataset.jsonl`, matching 1A's own LoRA config (`r=16, lora_alpha=32, target_modules=["q_proj","v_proj"]`). On a T4-class GPU this should take well under an hour (1A's own SFT stage took 23 seconds on an RTX 2000 Ada for 80 steps; CPT took about 11 minutes for 900 steps).
+This reproduces 1A exactly: 4 CPT epochs (`SEQ_LENGTH=2048`, effective batch 8, `lr=5e-5`) then 8 SFT epochs of genuine 4-bit QLoRA on the real 65-pair `instruction_dataset.jsonl` (effective batch 4, `lr=2e-4`), matching 1A's own LoRA config (`r=16, lora_alpha=32, target_modules=["q_proj","v_proj"]`) and chat template. On an A100-class GPU this should take well under 30 minutes for both stages combined.
 
 It overwrites `./cpt_final_model` and `./final_qlora_adapter` in place — the notebook already points at these same paths, so no path changes are needed.
 
@@ -138,7 +145,7 @@ Either way, every output must come from this real run — don't hand-edit any ou
 
 `benchmark_10.json` is already fixed and reused as-is (the notebook only reads it, it isn't regenerated). A fresh full run regenerates `results_partA.csv`, `results_partB.csv`, and `results_partC.csv` with real numbers end to end.
 
-Before this run, check the TODO (Vijay) cell in Part C (the 5 hand-picked classifier test queries and their gold labels) — it's drafted so C1 isn't blocked, but the brief asks you to label those yourself, so confirm or edit them before trusting the classifier's reported accuracy.
+Two of the three `TODO (Vijay):` cells were reopened after the dataset/format/hyperparameter fixes, since the previous verdicts were reviewing the old, now-invalid run's specific sampled rows: the dataset spot-check (15 pairs) and the Part A judge spot-check (5 rows). The Part C classifier test set TODO is still confirmed as-is -- its 5 queries don't depend on `instruction_dataset.jsonl`'s specific content, so Vijay's earlier confirmation still holds.
 
 ## 7. Export to HTML and finish up
 
@@ -149,8 +156,8 @@ jupyter nbconvert --to html Assignment2A_Group172.ipynb
 Then, per the assignment's ground rules:
 - Scan the notebook for any leftover "marks" text (there shouldn't be any — already checked) and remove anything that slipped in.
 - List every remaining `TODO (Vijay):` and `DRAFT -- review before submission:` cell so the human-judgement parts can be completed before submission. As of this writing there are 3 of each:
-  - `TODO (Vijay):` — the Part A dataset spot-check (15 pairs), the Part A judge spot-check (5 rows, agree/disagree), and the Part C classifier test set (5 queries/labels)
-  - `DRAFT --`: the Part A self-critique verdict, the Part B plan-solve-verify verdict, the Part C ~100-word router analysis — all computed from real numbers, but worth a human read before submitting
+  - `TODO (Vijay):` — the Part A dataset spot-check (15 pairs, reopened), the Part A judge spot-check (5 rows, agree/disagree, reopened), and the Part C classifier test set (5 queries/labels, still confirmed from before)
+  - `DRAFT --`: the Part A self-critique verdict, the Part B plan-solve-verify verdict, the Part C ~100-word router analysis — all auto-computed from whatever real numbers this run produces, but worth a human read before submitting
 - Check off the submission checklist (notebook + HTML, `benchmark_10.json`, `results_partA.csv`, `results_partB.csv`, `results_partC.csv`).
 
 ## 8. Send results back

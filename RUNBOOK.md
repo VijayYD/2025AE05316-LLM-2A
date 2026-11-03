@@ -125,11 +125,21 @@ judge_model = AutoModelForCausalLM.from_pretrained(
 
 ## 6. Run the notebook top to bottom
 
+Two equivalent ways to do this — pick whichever fits how you're working:
+
+**Headless (walk away from it):**
 ```bash
 jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=3600 Assignment2A_Group172.ipynb
 ```
 
-Or open it in Jupyter/Colab and use Kernel → Restart & Run All. Either way, every output must come from this real run — don't hand-edit any output cell.
+**Interactively in JupyterLab (lets you watch each Part and stop between them, per the notebook's own working style):** first register this project's `.venv` as a kernel, since a JupyterHub-managed Jupyter server won't see it otherwise —
+```bash
+source .venv/bin/activate
+python -m ipykernel install --user --name=llm2a --display-name "LLM2A (.venv)"
+```
+then open `Assignment2A_Group172.ipynb` in JupyterLab, switch the kernel (top-right) to **LLM2A (.venv)**, and either run cells one at a time top to bottom or use Kernel → Restart Kernel and Run All Cells.
+
+Either way, every output must come from this real run — don't hand-edit any output cell.
 
 `benchmark_10.json` is already fixed and reused as-is (the notebook only reads it, it isn't regenerated). This run regenerates `results_partA.csv` and the Part A results table with real numbers from the full-fidelity adapter and the real Qwen2.5-7B-Instruct judge.
 

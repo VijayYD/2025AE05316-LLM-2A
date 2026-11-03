@@ -34,20 +34,22 @@ pip install --upgrade pip
 pip install -r requirements-gpu.txt
 ```
 
-`requirements-gpu.txt` pins `torch==2.4.1+cu121` (a CUDA 12.1 build), which runs on any driver reporting CUDA 12.1 or newer — this matched the Prayogshala lab driver (CUDA 12.2) when this was last checked. If `torch.cuda.is_available()` still comes back `False` after the install, check what CUDA version your driver actually supports:
+`requirements-gpu.txt` pins the whole ML stack to versions confirmed compatible with each other (`torch==2.5.1+cu121`, `transformers==4.46.3`, `peft==0.13.2`, `accelerate==0.34.2`, `bitsandbytes==0.43.3`) rather than just a floor version — leaving `transformers`/`peft` unpinned let pip grab a release requiring `torch>=2.6`, which doesn't ship a `cu121` build at all and breaks `peft`'s import chain (`NameError: name 'nn' is not defined`) when `transformers` disables its torch integration. `cu121` runs on any driver reporting CUDA 12.1 or newer — this matched the Prayogshala lab driver (CUDA 12.2) when this was last checked.
+
+If `torch.cuda.is_available()` still comes back `False` after the install, check what CUDA version your driver actually supports:
 
 ```bash
 nvidia-smi   # look at "CUDA Version:" in the top-right of the header
 ```
 
-If it's older than 12.1, reinstall torch for a matching wheel (e.g. cu118), and update the pin in `requirements-gpu.txt` to match:
+If it's older than 12.1, reinstall torch for a matching wheel (e.g. cu118 — a torch release that still ships a cu118 build, such as 2.5.1), and update the pin in `requirements-gpu.txt` to match:
 
 ```bash
 pip uninstall -y torch
-pip install torch==2.4.1+cu118 --index-url https://download.pytorch.org/whl/cu118
+pip install torch==2.5.1+cu118 --index-url https://download.pytorch.org/whl/cu118
 ```
 
-(cu118, cu121, cu124, etc. — pick the index matching `nvidia-smi`'s reported CUDA version.)
+(cu118, cu121, cu124, etc. — pick the index matching `nvidia-smi`'s reported CUDA version; check which torch releases still publish that build before picking a version.)
 
 ### Option B — Google Colab
 

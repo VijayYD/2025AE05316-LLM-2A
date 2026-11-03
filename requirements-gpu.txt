@@ -1,10 +1,10 @@
 --extra-index-url https://download.pytorch.org/whl/cu121
 numpy
-torch==2.4.1+cu121
-transformers>=4.46
-peft>=0.13
-accelerate>=0.34
-bitsandbytes>=0.43
+torch==2.5.1+cu121
+transformers==4.46.3
+peft==0.13.2
+accelerate==0.34.2
+bitsandbytes==0.43.3
 datasets>=2.19
 pandas
 jupyter

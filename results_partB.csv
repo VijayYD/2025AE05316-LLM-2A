@@ -1,0 +1,41 @@
+problem_id,pattern,query,answer,tokens_used,latency_sec,judge_score,judge_reason
+1,zero_shot,"SmolLM2-360M has hidden_size=960, 15 attention heads, 5 key-value heads (grouped-query attention), and 32 transformer layers. A LoRA adapter with rank r=16 is applied to the q_proj and v_proj linear layers in every layer. How many trainable parameters does LoRA add in total?","The LoRA adapter adds 160M parameters, or 160M + 15M + 32M = 400M parameters.",129,1.1999066732823849,0,"The candidate answer contains incorrect information, as it does not match the detailed calculation provided in the known correct answer."
+1,chain_of_thought,"SmolLM2-360M has hidden_size=960, 15 attention heads, 5 key-value heads (grouped-query attention), and 32 transformer layers. A LoRA adapter with rank r=16 is applied to the q_proj and v_proj linear layers in every layer. How many trainable parameters does LoRA add in total?","1. The LoRA adapter adds 16 attention heads, 15 key-value heads, and 32 transformer layers.
+2. The total number of attention heads is 16 * 960 = 1,440.
+3. The total number of key-value heads is 15 * 960 = 14,800.
+4. The total number of transformer layers is 32 * 960 = 3,040.
+5. The total number of trainable parameters is 1,440 + 14,800 + 3,040 = 5,120.
+6. The total number of trainable parameters is 5,120 / 16 = 300.
+7. The total number of trainable parameters is 300 * 16 = 48",325,6.401728862896562,0,The candidate answer contains multiple incorrect calculations and misunderstandings of the LoRA application.
+1,self_consistency,"SmolLM2-360M has hidden_size=960, 15 attention heads, 5 key-value heads (grouped-query attention), and 32 transformer layers. A LoRA adapter with rank r=16 is applied to the q_proj and v_proj linear layers in every layer. How many trainable parameters does LoRA add in total?","1. For each LoRA layer, we apply LoRA to the two next layers of the hidden layer and the next two layers of the attention head, so the total number of layers is 16, and for LoRA each layer has one attention head with 960 parameters.
+2. Then we apply the adapter to the query and value head layers. For each iteration (in the loop), we apply LoRA to the next one, so the total number of layers is 4, and for the adapter each layer has 15 attention heads with 960 parameters.
+3. This gives a total of 23LoRA layers, and the adapter is a linear layer with 15 attention heads with 960 parameters. So the total trainable parameters is 23 * 15 * 960 = 105500 parameters.
+4. This corresponds to the total number of trainable parameters in",1463,30.14193746354431,0,The candidate answer contains several incorrect calculations and misunderstandings of how LoRA works.
+2,zero_shot,"Chinchilla's own compute-optimal training used 1.4 trillion tokens for its 70-billion-parameter model. GPT-3 was trained on 300 billion tokens for its 175-billion-parameter model. Compute each model's tokens-per-parameter ratio, and state by what factor GPT-3's training ratio falls short of Chinchilla's compute-optimal ratio.","Chinchilla's compute-optimal ratio is 1.4 trillion tokens per 70 billion parameters, while GPT-3's ratio is 300 billion tokens per 175 billion parameters.",141,1.4401388401165605,1,The answer provides the ratios but does not calculate the factor by which GPT-3's ratio falls short of Chinchilla's.
+2,chain_of_thought,"Chinchilla's own compute-optimal training used 1.4 trillion tokens for its 70-billion-parameter model. GPT-3 was trained on 300 billion tokens for its 175-billion-parameter model. Compute each model's tokens-per-parameter ratio, and state by what factor GPT-3's training ratio falls short of Chinchilla's compute-optimal ratio.","1. Chinchilla's compute-optimal ratio is 1.4 trillion tokens per 70 billion parameters.
+2. GPT-3's training ratio is 300 billion tokens per 175 billion parameters.
+3. Chinchilla's ratio is 1.4 trillion tokens per 70 billion parameters.
+4. GPT-3's ratio is 300 billion tokens per 175 billion parameters.
+5. Chinchilla's ratio is 1.4 trillion tokens per 70 billion parameters.
+6. GPT-3's ratio is 300 billion tokens per 175 billion parameters.
+7. Chinchilla's ratio is 1.4 trillion tokens per 70 billion parameters.
+8. GPT-3's ratio is 300 billion tokens per 175 billion parameters.
+9. Chinchilla's ratio is 1.",329,6.375641422346234,2,"All key facts are present and correct, but the final statement is redundant and does not provide the required ratio comparison."
+2,self_consistency,"Chinchilla's own compute-optimal training used 1.4 trillion tokens for its 70-billion-parameter model. GPT-3 was trained on 300 billion tokens for its 175-billion-parameter model. Compute each model's tokens-per-parameter ratio, and state by what factor GPT-3's training ratio falls short of Chinchilla's compute-optimal ratio.","1. The ratio of tokens-per-parameter to compute-optimal ratio is the number of tokens required compared to tokens-per-parameter ratio.
+2. GPT-3 used 1.4 trillion tokens for its 70-billion parameters, but Chinchilla used 1.5 trillion tokens for its 70-billion parameters.
+3. To compute the ratio of tokens-per-parameter to compute-optimal ratio, divide the number of tokens by the number of parameters.
+4. GPT-3's ratio was 1.4 trillion / 70 billion.
+5. Chinchilla's ratio was 1.5 trillion / 70 billion.
+
+Example:
+GPT-3: 1.4 trillion tokens / 70 billion parameters  = 2.0 tokens-per-parameter
+Chinchilla: 1.5 trillion tokens / 70 billion parameters  = 2.0",1645,32.54521351028234,1,"The candidate answer incorrectly states that Chinchilla used 1.5 trillion tokens, when it actually used 1.4 trillion tokens."
+1,plan_solve_verify,"SmolLM2-360M has hidden_size=960, 15 attention heads, 5 key-value heads (grouped-query attention), and 32 transformer layers. A LoRA adapter with rank r=16 is applied to the q_proj and v_proj linear layers in every layer. How many trainable parameters does LoRA add in total?","1. q_proj_attn = attention(q_proj, v_proj, attention_weights)
+2. v_proj_attn = attention(q_proj, v_proj, attention_weights)
+3. q_proj_attn_loRA = attention(q_proj, v_proj, attention_weights)
+4. v_proj_attn_loRA = attention(q_proj, v_proj, attention_weights)
+5. q_proj_attn_loRA = attention(q_proj, v_proj, attention_weights)
+6. v_proj_attn_loRA = attention(q_proj, v_proj, attention_weights)
+7. q_proj_attn_loRA = attention(q_proj, v_proj, attention_weights)
+8. v_proj_attn_loRA = attention(q_",1830,24.83316481951624,0,The candidate answer does not provide the number of trainable parameters added by LoRA and instead contains irrelevant code snippets that do not address the question.
+2,plan_solve_verify,"Chinchilla's own compute-optimal training used 1.4 trillion tokens for its 70-billion-parameter model. GPT-3 was trained on 300 billion tokens for its 175-billion-parameter model. Compute each model's tokens-per-parameter ratio, and state by what factor GPT-3's training ratio falls short of Chinchilla's compute-optimal ratio.",0.1 tokens-per-parameter.,1126,25.408560981042683,0,The candidate answer is incorrect as it does not provide the correct tokens-per-parameter ratios or the factor by which GPT-3 falls short compared to Chinchilla.
